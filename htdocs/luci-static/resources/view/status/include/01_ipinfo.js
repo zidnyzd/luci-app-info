@@ -9,45 +9,36 @@
 'require fs';
 
 return view.extend({
-	title: _('IP Information'),
-	handleSaveApply: null,
-	handleSave: null,
-	handleReset: null,
-	load: function () {
-		return uci.load('ipinfo').then(function() {
-			var data = uci.sections('ipinfo');
-			var jsonData = {};
-			if (data[0].enable === '0') {
-				jsonData.uci = {
-					enable: data[0].enable
-				};
-				return jsonData;
-			} else {
-				return fs.exec('curl', ['-s', '-m', '5', '-o', '/dev/null', 'https://www.google.com']).then(function(result) {
-					if (result.code === 0) {
-						if (data.length > 0) {
-							var item = data[0];
-							jsonData.uci = {
-								enable: item.enable,
-								isp: item.isp,
-								loc: item.loc,
-								co: item.co
-							};
-						} else {
-							jsonData.uci = null;
-						};
-						return fs.exec('curl', ['-sL', 'ip.guide']).then(function(result) {
-							var data = JSON.parse(result.stdout);
-							jsonData.json = data;
-							return jsonData;
-						});
-					} else {
-						return jsonData;
-					};
-				});
-			};
-		});
-	},
+    title: _('IP Information'),
+    handleSaveApply: null,
+    handleSave: null,
+    handleReset: null,
+    load: function () {
+        return uci.load('ipinfo').then(function() {
+            var data = uci.sections('ipinfo');
+            var jsonData = {};
+            
+            // Initial placeholders in the fields
+            document.querySelector('[data-name="public_ip"] .cbi-value-field').textContent = 'Loading...';
+            document.querySelector('[data-name="location"] .cbi-value-field').textContent = 'Loading...';
+
+            if (data[0].enable === '0') {
+                jsonData.uci = {};
+                return jsonData;
+            }
+
+            jsonData.uci = {
+                public_ip: data[0].public_ip,
+                location: data[0].location
+            };
+
+            // After loading, fill the fields with the actual data
+            document.querySelector('[data-name="public_ip"] .cbi-value-field').textContent = jsonData.uci.public_ip || 'Unavailable';
+            document.querySelector('[data-name="location"] .cbi-value-field').textContent = jsonData.uci.location || 'Unavailable';
+            
+            return jsonData;
+        });
+    },
 	render: function (data) {
 		var container;
 		var table = E('table', {'class': 'table'});
