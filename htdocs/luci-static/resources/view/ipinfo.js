@@ -8,38 +8,42 @@
 'require form';
 
 return view.extend({
-	render: function () {
-		var m, s, o;
-		m = new form.Map('ipinfo', _('IP Information'),
-			_('Shows public IP information in Overview LuCI with <a %s>ip.guide</a>.').format('href="https://ip.guide" target="_blank"'));
-		s = m.section(form.NamedSection, 'config', 'ipinfo');
-		s.anonymous = true;
+    render: function () {
+        var m, s;
+        m = new form.Map('ipinfo', _('IP Information'),
+            _('Shows public IP information in Overview LuCI with <a %s>ip.guide</a>.').format('href="https://ip.guide" target="_blank"'));
 
-		o = s.option(form.Flag, 'enable', _('Enable'),
-			_('Enable or disable service.'));
-		o.rmempty = false;
+        s = m.section(form.NamedSection, 'config', 'ipinfo');
 
-		o = s.option(form.MultiValue, 'isp', _('Provider Information'),
-			_('Select ISP information to display.'));
-		o.display_size = '4';
-		o.value('ip', _('Public IP'));
-		o.value('name', _('Provider'));
-		o.value('organization', _('Organization'));
-		o.value('asn', _('AS Number'));
+        // Initial render with empty fields for all IP info
+        s.option(form.Value, 'public_ip', _('Public IP')).textvalue = function() {
+            return 'Loading...';
+        };
+        s.option(form.Value, 'name', _('Name')).textvalue = function() {
+            return 'Loading...';
+        };
+        s.option(form.Value, 'organization', _('Organization')).textvalue = function() {
+            return 'Loading...';
+        };
+        s.option(form.Value, 'asn', _('ASN')).textvalue = function() {
+            return 'Loading...';
+        };
+        s.option(form.Value, 'city', _('City')).textvalue = function() {
+            return 'Loading...';
+        };
+        s.option(form.Value, 'country', _('Country')).textvalue = function() {
+            return 'Loading...';
+        };
+        s.option(form.Value, 'timezone', _('Timezone')).textvalue = function() {
+            return 'Loading...';
+        };
+        s.option(form.Value, 'latitude', _('Latitude')).textvalue = function() {
+            return 'Loading...';
+        };
+        s.option(form.Value, 'longitude', _('Longitude')).textvalue = function() {
+            return 'Loading...';
+        };
 
-		o = s.option(form.MultiValue, 'loc', _('Location Information'),
-			_('Select location information to display.'));
-		o.display_size = '3';
-		o.value('city', _('City'));
-		o.value('country', _('Country'));
-		o.value('timezone', _('Timezone'));
-
-		o = s.option(form.MultiValue, 'co', _('Coordinate Information'),
-			_('Select coordinate information to display.'));
-		o.display_size = '2';
-		o.value('latitude', _('Latitude'));
-		o.value('longitude', _('Longitude'));
-
-		return m.render();
-	},
+        return m.render();
+    }
 });
