@@ -17,10 +17,17 @@ return view.extend({
         return uci.load('ipinfo').then(function() {
             var data = uci.sections('ipinfo');
             var jsonData = {};
-            
+
             // Initial placeholders in the fields
             document.querySelector('[data-name="public_ip"] .cbi-value-field').textContent = 'Loading...';
-            document.querySelector('[data-name="location"] .cbi-value-field').textContent = 'Loading...';
+            document.querySelector('[data-name="name"] .cbi-value-field').textContent = 'Loading...';
+            document.querySelector('[data-name="organization"] .cbi-value-field').textContent = 'Loading...';
+            document.querySelector('[data-name="asn"] .cbi-value-field').textContent = 'Loading...';
+            document.querySelector('[data-name="city"] .cbi-value-field').textContent = 'Loading...';
+            document.querySelector('[data-name="country"] .cbi-value-field').textContent = 'Loading...';
+            document.querySelector('[data-name="timezone"] .cbi-value-field').textContent = 'Loading...';
+            document.querySelector('[data-name="latitude"] .cbi-value-field').textContent = 'Loading...';
+            document.querySelector('[data-name="longitude"] .cbi-value-field').textContent = 'Loading...';
 
             if (data[0].enable === '0') {
                 jsonData.uci = {};
@@ -29,75 +36,28 @@ return view.extend({
 
             jsonData.uci = {
                 public_ip: data[0].public_ip,
-                location: data[0].location
+                name: data[0].name,
+                organization: data[0].organization,
+                asn: data[0].asn,
+                city: data[0].city,
+                country: data[0].country,
+                timezone: data[0].timezone,
+                latitude: data[0].latitude,
+                longitude: data[0].longitude
             };
 
             // After loading, fill the fields with the actual data
             document.querySelector('[data-name="public_ip"] .cbi-value-field').textContent = jsonData.uci.public_ip || 'Unavailable';
-            document.querySelector('[data-name="location"] .cbi-value-field').textContent = jsonData.uci.location || 'Unavailable';
+            document.querySelector('[data-name="name"] .cbi-value-field').textContent = jsonData.uci.name || 'Unavailable';
+            document.querySelector('[data-name="organization"] .cbi-value-field').textContent = jsonData.uci.organization || 'Unavailable';
+            document.querySelector('[data-name="asn"] .cbi-value-field').textContent = jsonData.uci.asn || 'Unavailable';
+            document.querySelector('[data-name="city"] .cbi-value-field').textContent = jsonData.uci.city || 'Unavailable';
+            document.querySelector('[data-name="country"] .cbi-value-field').textContent = jsonData.uci.country || 'Unavailable';
+            document.querySelector('[data-name="timezone"] .cbi-value-field').textContent = jsonData.uci.timezone || 'Unavailable';
+            document.querySelector('[data-name="latitude"] .cbi-value-field').textContent = jsonData.uci.latitude || 'Unavailable';
+            document.querySelector('[data-name="longitude"] .cbi-value-field').textContent = jsonData.uci.longitude || 'Unavailable';
             
             return jsonData;
         });
-    },
-	render: function (data) {
-		var container;
-		var table = E('table', {'class': 'table'});
-		if (!data || Object.keys(data).length === 0) {
-			var row = E('tr', {'class': 'tr'}, [
-				E('td', {'class': 'td'}, _('No internet connection.'))
-			]);
-			table.appendChild(row);
-			return table;
-		} else if (data.uci && data.uci.enable === '1') {
-			var hasData = false;
-			var categories = ['isp', 'loc', 'co'];
-			var propertiesToShow = {
-				'ip': _('Public IP'),
-				'network.autonomous_system.name': _('Provider'),
-				'network.autonomous_system.organization': _('Organization'),
-				'network.autonomous_system.asn': _('ASN Number'),
-				'location.city': _('City'),
-				'location.country': _('Country'),
-				'location.timezone': _('Timezone'),
-				'location.latitude': _('Latitude'),
-				'location.longitude': _('Longitude')
-			};
-			var dataUci = {
-				'ip': 'ip',
-				'network.autonomous_system.name': 'name',
-				'network.autonomous_system.organization': 'organization',
-				'network.autonomous_system.asn': 'asn',
-				'location.city': 'city',
-				'location.country': 'country',
-				'location.timezone': 'timezone',
-				'location.latitude': 'latitude',
-				'location.longitude': 'longitude'
-			};
-			categories.forEach(function(category) {
-				if (data.uci[category]) {
-					data.uci[category].forEach(function(key) {
-						var propKey = Object.keys(dataUci).find(k => dataUci[k] === key);
-						if (propKey) {
-							hasData = true;
-							var value = propKey.split('.').reduce((o, i) => o ? o[i] : null, data.json);
-							var row = E('tr', {'class': 'tr'}, [
-								E('td', {'class': 'td left', 'width': '33%'}, propertiesToShow[propKey]),
-								E('td', {'class': 'td left'}, value || '-')
-							]);
-							table.appendChild(row);
-						}
-					});
-				}
-			});
-			if (!hasData) {
-				var row = E('tr', {'class': 'tr'}, [
-					E('td', {'class': 'td'}, _('No data available, please check the settings.'))
-				]);
-				table.appendChild(row);
-			}
-			return table;
-		} else if (data.uci && data.uci.enable !== '1') {
-			return container;
-		};
-	}
+    }
 });
